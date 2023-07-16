@@ -3,14 +3,14 @@ import java.util.Arrays;
 
 public class Block {
 
-    public Color color;
+    private Color color;
     public int posizionex = 150;
     public int posizioney = 50;
     public int PosX[];
     public int PosY[];
 
-    double rotx = 0;
-    double roty = 0;
+    private double rotx;
+    private double roty;
 
     public Block(Color color, double rotx, double roty, int[] vettx, int[] vetty) {
 
@@ -95,5 +95,7 @@ public class Block {
     public void scendi() {
         posizioney += 50;
     }
+
+    public Color getColor(){ return color;}
 
 }

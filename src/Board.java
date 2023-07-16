@@ -31,7 +31,7 @@ public class Board extends JPanel implements KeyListener, ActionListener {
 
     public void paintComponent(Graphics g) {
         super.paintComponent(g);
-        if (inizio == false) {
+        if (!inizio) {
             g.drawImage(miaimmagine, 240, 120, this);
 
             g.setColor(Color.WHITE);
@@ -41,15 +41,15 @@ public class Board extends JPanel implements KeyListener, ActionListener {
             g.drawString("Premere spazio per iniziare", 210, 600);
 
         } else {
-            if (perdita == false) {
+            if (!perdita) {
                 g.setColor(Color.black);
                 for (int i = 0; i < 4; i++) {
-                    g.setColor(prova.color);
+                    g.setColor(prova.getColor());
                     g.fillRect(prova.PosX[i] * 50 + prova.posizionex, prova.PosY[i] * 50 + prova.posizioney, 50, 50);
                 }
                 for (int i = 0; i < 16; i++)
                     for (int j = 0; j < 10; j++)
-                        if (scacchiera[i][j] == true) {
+                        if (scacchiera[i][j]) {
                             g.setColor(scacchiera2[i][j]);
                             g.fillRect(j * 50, i * 50, 50, 50);
                         }
@@ -72,7 +72,7 @@ public class Board extends JPanel implements KeyListener, ActionListener {
                 g.drawString("Premi r per far ruotare il pezzo", 520, 550);
                 g.drawString("Premi le freccette per muovere il pezzo", 520, 500);
                 for (int i = 0; i < 4; i++) {
-                    g.setColor(prova2.color);
+                    g.setColor(prova2.getColor());
                     g.fillRect(prova2.PosX[i] * 50 + 550, prova2.PosY[i] * 50 + 200, 50, 50);
                 }
 
@@ -89,8 +89,8 @@ public class Board extends JPanel implements KeyListener, ActionListener {
     }
 
     public void scendi() {
-        int PosMax[] = new int[4];
-        int PosMaxX[] = new int[4];
+        int[] PosMax = new int[4];
+        int[] PosMaxX = new int[4];
         for (int i = 0; i < 4; i++) {
             PosMax[i]--;
             PosMaxX[i]--;
@@ -105,7 +105,7 @@ public class Board extends JPanel implements KeyListener, ActionListener {
             timer = 0;
             for (int i = 0; i < 4; i++) {
                 scacchiera[(prova.PosY[i] * 50 + prova.posizioney) / 50][(prova.PosX[i] * 50 + prova.posizionex) / 50] = true;
-                scacchiera2[(prova.PosY[i] * 50 + prova.posizioney) / 50][(prova.PosX[i] * 50 + prova.posizionex) / 50] = prova.color;
+                scacchiera2[(prova.PosY[i] * 50 + prova.posizioney) / 50][(prova.PosX[i] * 50 + prova.posizionex) / 50] = prova.getColor();
             }
             stascendendo = false;
             checkRiga();
