@@ -3,19 +3,18 @@ import java.awt.*;
 
 public class Main {
     public static void main(String[] args) {
-        JFrame cornice = new JFrame();
-        cornice.setTitle("Tetris");
+        JFrame frame = new JFrame();
+        frame.setTitle("Tetris");
 
-        Container c;
-        c = cornice.getContentPane();
+        Container container = frame.getContentPane();
 
-        Pannello p = new Pannello();
-        c.add(p);
+        Board p = new Board();
+        container.add(p);
 
-        cornice.setVisible(true);
-        cornice.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        frame.setVisible(true);
+        frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 
-        cornice.pack();
+        frame.pack();
     }
 }
    

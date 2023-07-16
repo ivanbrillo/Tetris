@@ -5,11 +5,11 @@ import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 
-public class Pannello extends JPanel implements KeyListener, ActionListener {
+public class Board extends JPanel implements KeyListener, ActionListener {
 
     Timer tm = new Timer(150, this);
-    Blocco prova = new Blocco();
-    Blocco prova2 = new Blocco();
+    Block prova = BlockFactory.getRandomBlock();
+    Block prova2 = BlockFactory.getRandomBlock();
     boolean scacchiera[][] = new boolean[16][10];
     Color scacchiera2[][] = new Color[16][10];
     int timer = 0;
@@ -19,7 +19,7 @@ public class Pannello extends JPanel implements KeyListener, ActionListener {
     boolean inizio = false;
     boolean perdita = false;
 
-    public Pannello() {
+    public Board() {
         setPreferredSize(new Dimension(800, 800));
         setBackground(Color.black);
         addKeyListener(this);
@@ -44,7 +44,7 @@ public class Pannello extends JPanel implements KeyListener, ActionListener {
             if (perdita == false) {
                 g.setColor(Color.black);
                 for (int i = 0; i < 4; i++) {
-                    g.setColor(prova.colore);
+                    g.setColor(prova.color);
                     g.fillRect(prova.PosX[i] * 50 + prova.posizionex, prova.PosY[i] * 50 + prova.posizioney, 50, 50);
                 }
                 for (int i = 0; i < 16; i++)
@@ -72,7 +72,7 @@ public class Pannello extends JPanel implements KeyListener, ActionListener {
                 g.drawString("Premi r per far ruotare il pezzo", 520, 550);
                 g.drawString("Premi le freccette per muovere il pezzo", 520, 500);
                 for (int i = 0; i < 4; i++) {
-                    g.setColor(prova2.colore);
+                    g.setColor(prova2.color);
                     g.fillRect(prova2.PosX[i] * 50 + 550, prova2.PosY[i] * 50 + 200, 50, 50);
                 }
 
@@ -105,14 +105,14 @@ public class Pannello extends JPanel implements KeyListener, ActionListener {
             timer = 0;
             for (int i = 0; i < 4; i++) {
                 scacchiera[(prova.PosY[i] * 50 + prova.posizioney) / 50][(prova.PosX[i] * 50 + prova.posizionex) / 50] = true;
-                scacchiera2[(prova.PosY[i] * 50 + prova.posizioney) / 50][(prova.PosX[i] * 50 + prova.posizionex) / 50] = prova.colore;
+                scacchiera2[(prova.PosY[i] * 50 + prova.posizioney) / 50][(prova.PosX[i] * 50 + prova.posizionex) / 50] = prova.color;
             }
             stascendendo = false;
             checkRiga();
             checkFregature();
 
             prova = prova2;
-            prova2 = new Blocco();
+            prova2 = BlockFactory.getRandomBlock();
 
             repaint();
         }
@@ -129,7 +129,7 @@ public class Pannello extends JPanel implements KeyListener, ActionListener {
                 posX[i] = prova.PosX[i];
                 posY[i] = prova.PosY[i];
             }
-            Blocco prova2 = new Blocco(prova.k, posX, posY);
+            Block prova2 = new Block(prova);
             prova2.posizionex = prova.posizionex;
             prova2.posizioney = prova.posizioney;
             prova2.gira();
