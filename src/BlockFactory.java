@@ -1,4 +1,5 @@
 import java.awt.*;
+import java.util.ArrayList;
 import java.util.Random;
 
 public class BlockFactory {
@@ -27,28 +28,33 @@ public class BlockFactory {
 
     public static Block getRandomBlock() {
         int k = random.nextInt(7);
+        ArrayList<Point> position = new ArrayList<>();
+
+        for(int i=0; i<4; i++)
+            position.add(new Point(blocksPositionX[k][i], blocksPositionY[k][i]));
+
 
         switch (k) {
             case 0 -> {
-                return new Block(Color.cyan, blocksPositionX[k], blocksPositionY[k], 4);
+                return new Block(Color.cyan, position, 4);
             }
             case 1 -> {
-                return new Block(Color.blue, blocksPositionX[k], blocksPositionY[k], 3);
+                return new Block(Color.blue, position, 3);
             }
             case 2 -> {
-                return new Block(Color.orange, blocksPositionX[k], blocksPositionY[k], 3);
+                return new Block(Color.orange, position, 3);
             }
             case 3 -> {
-                return new Block(Color.yellow, blocksPositionX[k], blocksPositionY[k], 2);
+                return new Block(Color.yellow, position, 2);
             }
             case 4 -> {
-                return new Block(Color.green, blocksPositionX[k], blocksPositionY[k], 3);
+                return new Block(Color.green, position, 3);
             }
             case 5 -> {
-                return new Block(new Color(92, 46, 145), blocksPositionX[k], blocksPositionY[k], 3);
+                return new Block(new Color(92, 46, 145), position, 3);
             }
             case 6 -> {
-                return new Block(Color.red, blocksPositionX[k], blocksPositionY[k], 3);
+                return new Block(Color.red, position, 3);
             }
             default -> throw new RuntimeException();
         }

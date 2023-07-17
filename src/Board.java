@@ -45,7 +45,7 @@ public class Board extends JPanel implements KeyListener, ActionListener {
                 g.setColor(Color.black);
                 for (int i = 0; i < 4; i++) {
                     g.setColor(prova.getColor());
-                    g.fillRect(prova.PosX[i] * 50 + prova.posizionex, prova.PosY[i] * 50 + prova.posizioney, 50, 50);
+                    g.fillRect(prova.getPoint(i).x * 50 + prova.position.x, prova.getPoint(i).y * 50 + prova.position.y, 50, 50);
                 }
                 for (int i = 0; i < 16; i++)
                     for (int j = 0; j < 10; j++)
@@ -73,7 +73,7 @@ public class Board extends JPanel implements KeyListener, ActionListener {
                 g.drawString("Premi le freccette per muovere il pezzo", 520, 500);
                 for (int i = 0; i < 4; i++) {
                     g.setColor(prova2.getColor());
-                    g.fillRect(prova2.PosX[i] * 50 + 550, prova2.PosY[i] * 50 + 200, 50, 50);
+                    g.fillRect(prova2.getPoint(i).x * 50 + 550, prova2.getPoint(i).y * 50 + 200, 50, 50);
                 }
 
             } else {
@@ -97,15 +97,15 @@ public class Board extends JPanel implements KeyListener, ActionListener {
         }
         prova.minore(PosMax, PosMaxX);
 
-        if ((PosMax[0] == -1 || (PosMax[0] < 15 && scacchiera[PosMax[0] + 1][PosMaxX[0]] == false)) && (PosMax[1] == -1 || (PosMax[1] < 15 && scacchiera[PosMax[1] + 1][PosMaxX[1]] == false)) && (PosMax[2] == -1 || (PosMax[2] < 15 && scacchiera[PosMax[2] + 1][PosMaxX[2]] == false)) && (PosMax[3] == -1 || (PosMax[3] < 15 && scacchiera[PosMax[3] + 1][PosMaxX[3]] == false))) {
+        if ((PosMax[0] == -1 || (PosMax[0] < 15 && !scacchiera[PosMax[0] + 1][PosMaxX[0]])) && (PosMax[1] == -1 || (PosMax[1] < 15 && scacchiera[PosMax[1] + 1][PosMaxX[1]] == false)) && (PosMax[2] == -1 || (PosMax[2] < 15 && scacchiera[PosMax[2] + 1][PosMaxX[2]] == false)) && (PosMax[3] == -1 || (PosMax[3] < 15 && scacchiera[PosMax[3] + 1][PosMaxX[3]] == false))) {
             prova.drop();
             stascendendo = true;
             repaint();
         } else {
             timer = 0;
             for (int i = 0; i < 4; i++) {
-                scacchiera[(prova.PosY[i] * 50 + prova.posizioney) / 50][(prova.PosX[i] * 50 + prova.posizionex) / 50] = true;
-                scacchiera2[(prova.PosY[i] * 50 + prova.posizioney) / 50][(prova.PosX[i] * 50 + prova.posizionex) / 50] = prova.getColor();
+                scacchiera[(prova.getPoint(i).y * 50 + prova.position.y) / 50][(prova.getPoint(i).x * 50 + prova.position.x) / 50] = true;
+                scacchiera2[(prova.getPoint(i).y * 50 + prova.position.y) / 50][(prova.getPoint(i).x * 50 + prova.position.x) / 50] = prova.getColor();
             }
             stascendendo = false;
             checkRiga();
@@ -122,31 +122,33 @@ public class Board extends JPanel implements KeyListener, ActionListener {
     }
 
     public void keyPressed(KeyEvent e) {
-        if ((e.getKeyChar() == 'r' || e.getKeyChar() == 'R') && inizio == true) {
+        if ((e.getKeyChar() == 'r' || e.getKeyChar() == 'R') && inizio) {
             int posX[] = new int[4];
             int posY[] = new int[4];
             for (int i = 0; i < 4; i++) {
-                posX[i] = prova.PosX[i];
-                posY[i] = prova.PosY[i];
+                posX[i] = prova.getPoint(i).x;
+                posY[i] = prova.getPoint(i).y;
             }
             Block prova2 = new Block(prova);
-            prova2.posizionex = prova.posizionex;
-            prova2.posizioney = prova.posizioney;
+
             prova2.rotate();
+//            System.out.println(prova2.blocksPosition);
             int k = 0;
             for (int i = 0; i < 4; i++) {
-                if (prova2.PosX[i] * 50 + prova2.posizionex < 500 && prova2.PosX[i] * 50 + prova2.posizionex > 0 && (scacchiera[(prova2.PosY[i] * 50 + prova2.posizioney) / 50][(prova2.PosX[i] * 50 + prova2.posizionex) / 50] == false))
+                if (prova2.getPoint(i).x * 50 + prova2.position.x < 500 && prova2.getPoint(i).x * 50 + prova2.position.x > 0 && (!scacchiera[(prova2.getPoint(i).y * 50 + prova2.position.y) / 50][(prova2.getPoint(i).x * 50 + prova2.position.x) / 50]))
                     k++;
             }
             if (k == 4) {
+//                System.out.println(prova.blocksPosition);
                 prova.rotate();
+
                 repaint();
             }
         }
 
-        if (e.getKeyCode() == 39 && inizio == true) {
-            int PosMax[] = new int[4];
-            int PosMaxY[] = new int[4];
+        if (e.getKeyCode() == 39 && inizio) {
+            int[] PosMax = new int[4];
+            int[] PosMaxY = new int[4];
             for (int i = 0; i < 4; i++) {
                 PosMaxY[i]--;
                 PosMax[i]--;
@@ -154,18 +156,18 @@ public class Board extends JPanel implements KeyListener, ActionListener {
             prova.maggioreX(PosMax, PosMaxY);
             int k = 0;
             for (int i = 0; i < 4; i++) {
-                if (prova.PosX[i] * 50 + prova.posizionex < 450)
+                if (prova.getPoint(i).x * 50 + prova.position.x < 450)
                     k++;
-                if (PosMax[i] == -1 || (PosMax[i] + 1) > 9 || scacchiera[PosMaxY[i]][PosMax[i] + 1] == false)
+                if (PosMax[i] == -1 || (PosMax[i] + 1) > 9 || !scacchiera[PosMaxY[i]][PosMax[i] + 1])
                     k++;
             }
             if (k == 8) {
-                prova.posizionex += 50;
+                prova.position.x += 50;
                 repaint();
             }
         }
 
-        if (e.getKeyCode() == 37 && inizio == true) {
+        if (e.getKeyCode() == 37 && inizio) {
             int PosMax[] = new int[4];
             int PosMaxY[] = new int[4];
             for (int i = 0; i < 4; i++) {
@@ -175,23 +177,23 @@ public class Board extends JPanel implements KeyListener, ActionListener {
             prova.minoreX(PosMax, PosMaxY);
             int k = 0;
             for (int i = 0; i < 4; i++) {
-                if (prova.PosX[i] * 50 + prova.posizionex > 0)
+                if (prova.getPoint(i).x * 50 + prova.position.x > 0)
                     k++;
                 if (PosMax[i] == 99 || (PosMax[i] - 1) < 0 || scacchiera[PosMaxY[i]][PosMax[i] - 1] == false)
                     k++;
             }
             if (k == 8) {
-                prova.posizionex -= 50;
+                prova.position.x -= 50;
                 repaint();
             }
         }
 
-        if ((e.getKeyChar() == 'f' || e.getKeyChar() == 'F') && inizio == true) {
+        if ((e.getKeyChar() == 'f' || e.getKeyChar() == 'F') && inizio) {
             stascendendo = true;
         }
 
         if (e.getKeyChar() == ' ') {
-            if (inizio == false) {
+            if (!inizio) {
                 inizio = true;
                 tm.start();
                 repaint();

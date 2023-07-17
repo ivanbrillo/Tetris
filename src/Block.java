@@ -1,33 +1,31 @@
 import java.awt.*;
-import java.util.Arrays;
+import java.util.ArrayList;
 
 public class Block {
 
-    private Color color;
-    public int posizionex = 150;
-    public int posizioney = 50;
-    public int PosX[];
-    public int PosY[];
+    private final Color color;
+    Point position = new Point(150, 50);
+    private final ArrayList<Point> blocksPosition;
+    private final int length;
 
+    public Block(Color color, ArrayList<Point> blocksPosition, int length) {
 
-    private int lenght;
-
-    public Block(Color color, int[] vettx, int[] vetty, int lenght) {
-
+        this.blocksPosition = blocksPosition;
         this.color = color;
-        PosX = vettx;
-        PosY = vetty;
-        this.lenght = lenght;
+        this.length = length;
 
     }
 
     public Block(Block block){
 
         this.color = block.color;
-        PosX = Arrays.copyOf(block.PosX, block.PosX.length);
-        PosY = Arrays.copyOf(block.PosY, block.PosY.length);
-        this.lenght = block.lenght;
+        position = new Point(position);
 
+        blocksPosition = new ArrayList<> (block.blocksPosition.size());
+        for (Point point : block.blocksPosition)
+            blocksPosition.add(new Point(point));
+
+        this.length = block.length;
 
     }
 
@@ -38,10 +36,10 @@ public class Block {
             return;
 
         for (int i = 0; i < 4; i++) {
-            int tmp = PosX[i];
+            int tmp = blocksPosition.get(i).x;
 
-            PosX[i] = PosY[i];
-            PosY[i] = 1 - (tmp - (lenght - 2));
+            blocksPosition.get(i).x = blocksPosition.get(i).y;
+            blocksPosition.get(i).y = 1 - (tmp - (length - 2));
 
         }
     }
@@ -49,56 +47,58 @@ public class Block {
     public void minore(int posMax[], int PosMaxX[]) {
         for (int x = 0; x < 4; x++)
             for (int j = 0; j < 4; j++) {
-                if (PosX[j] == x)
-                    if (posMax[x] < PosY[j]) {
-                        posMax[x] = PosY[j];
-                        PosMaxX[x] = PosX[j];
+                if (blocksPosition.get(j).x == x)
+                    if (posMax[x] < blocksPosition.get(j).y) {
+                        posMax[x] = blocksPosition.get(j).y;
+                        PosMaxX[x] = blocksPosition.get(j).x;
                     }
             }
         for (int j = 0; j < 4; j++)
             if (posMax[j] != -1) {
-                PosMaxX[j] = (PosMaxX[j] * 50 + posizionex) / 50;
-                posMax[j] = (posMax[j] * 50 + posizioney) / 50;
+                PosMaxX[j] = (PosMaxX[j] * 50 + position.x) / 50;
+                posMax[j] = (posMax[j] * 50 + position.y) / 50;
             }
     }
 
     public void maggioreX(int posMax[], int PosMaxX[]) {
         for (int x = 0; x < 4; x++)
             for (int j = 0; j < 4; j++) {
-                if (PosY[j] == x)
-                    if (posMax[x] < PosX[j]) {
-                        posMax[x] = PosX[j];
-                        PosMaxX[x] = PosY[j];
+                if (blocksPosition.get(j).y == x)
+                    if (posMax[x] < blocksPosition.get(j).x) {
+                        posMax[x] =blocksPosition.get(j).x;
+                        PosMaxX[x] = blocksPosition.get(j).y;
                     }
 
             }
         for (int j = 0; j < 4; j++)
             if (posMax[j] != -1) {
-                posMax[j] = (posMax[j] * 50 + posizionex) / 50;
-                PosMaxX[j] = (PosMaxX[j] * 50 + posizioney) / 50;
+                posMax[j] = (posMax[j] * 50 + position.x) / 50;
+                PosMaxX[j] = (PosMaxX[j] * 50 + position.y) / 50;
             }
     }
 
     public void minoreX(int posMax[], int PosMaxX[]) {
         for (int x = 0; x < 4; x++)
             for (int j = 0; j < 4; j++) {
-                if (PosY[j] == x)
-                    if (posMax[x] > PosX[j]) {
-                        posMax[x] = PosX[j];
-                        PosMaxX[x] = PosY[j];
+                if (blocksPosition.get(j).y == x)
+                    if (posMax[x] > blocksPosition.get(j).x) {
+                        posMax[x] = blocksPosition.get(j).x;
+                        PosMaxX[x] = blocksPosition.get(j).y;
                     }
             }
         for (int j = 0; j < 4; j++)
             if (posMax[j] != 99) {
-                posMax[j] = (posMax[j] * 50 + posizionex) / 50;
-                PosMaxX[j] = (PosMaxX[j] * 50 + posizioney) / 50;
+                posMax[j] = (posMax[j] * 50 + position.x) / 50;
+                PosMaxX[j] = (PosMaxX[j] * 50 + position.y) / 50;
             }
     }
 
 
     public void drop() {
-        posizioney += 50;
+        position.y += 50;
     }
+
+    public Point getPoint(int i){return new Point(blocksPosition.get(i));}
 
     public Color getColor(){ return color;}
 
