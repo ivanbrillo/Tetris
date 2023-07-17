@@ -5,7 +5,7 @@ public class Block {
 
     private final Color color;
     Point position = new Point(150, 50);
-    private final ArrayList<Point> blocksPosition;
+    private ArrayList<Point> blocksPosition;
     private final int length;
 
     public Block(Color color, ArrayList<Point> blocksPosition, int length) {
@@ -16,58 +16,63 @@ public class Block {
 
     }
 
-    public Block(Block block){
+//    public Block(Block block) {
+//
+//        this.color = block.color;
+//        position = new Point(position);
+//
+//        blocksPosition = new ArrayList<>(block.blocksPosition.size());
+//        for (Point point : block.blocksPosition)
+//            blocksPosition.add(new Point(point));
+//
+//        this.length = block.length;
+//
+//    }
 
-        this.color = block.color;
-        position = new Point(position);
+    public ArrayList<Point> getRotationPoints() {
 
-        blocksPosition = new ArrayList<> (block.blocksPosition.size());
-        for (Point point : block.blocksPosition)
-            blocksPosition.add(new Point(point));
+        if (color.equals(Color.yellow))
+            return blocksPosition;
 
-        this.length = block.length;
+        ArrayList<Point> rotationPoints = new ArrayList<>();
+
+        for (int i = 0; i < 4; i++)
+            rotationPoints.add(new Point(blocksPosition.get(i).y, 1 - (blocksPosition.get(i).x - (length - 2))));
+
+        return rotationPoints;
+
 
     }
 
+    public ArrayList<Point> getAbsolutePosition(ArrayList<Point> points) {
 
-    public void rotate() {
+        ArrayList<Point> absolutePosition = new ArrayList<>(4);
 
-        if(color.equals(Color.yellow))
-            return;
-
-        for (int i = 0; i < 4; i++) {
-            int tmp = blocksPosition.get(i).x;
-
-            blocksPosition.get(i).x = blocksPosition.get(i).y;
-            blocksPosition.get(i).y = 1 - (tmp - (length - 2));
-
-        }
-    }
-
-    public void minore(int posMax[], int PosMaxX[]) {
-        for (int x = 0; x < 4; x++)
-            for (int j = 0; j < 4; j++) {
-                if (blocksPosition.get(j).x == x)
-                    if (posMax[x] < blocksPosition.get(j).y) {
-                        posMax[x] = blocksPosition.get(j).y;
-                        PosMaxX[x] = blocksPosition.get(j).x;
-                    }
-            }
         for (int j = 0; j < 4; j++)
-            if (posMax[j] != -1) {
-                PosMaxX[j] = (PosMaxX[j] * 50 + position.x) / 50;
-                posMax[j] = (posMax[j] * 50 + position.y) / 50;
-            }
+            absolutePosition.add(new Point((points.get(j).x * 50 + position.x) / 50, (points.get(j).y * 50 + position.y) / 50));
+
+        return absolutePosition;
     }
+
+    public ArrayList<Point> getAbsolutePosition() {
+        return getAbsolutePosition(blocksPosition);
+    }
+
+    public void setBlocksPosition(ArrayList<Point> blocksPosition){
+        this.blocksPosition = blocksPosition;
+    }
+
+
 
     public void maggioreX(int posMax[], int PosMaxX[]) {
         for (int x = 0; x < 4; x++)
             for (int j = 0; j < 4; j++) {
-                if (blocksPosition.get(j).y == x)
+                if (blocksPosition.get(j).y == x) {
                     if (posMax[x] < blocksPosition.get(j).x) {
-                        posMax[x] =blocksPosition.get(j).x;
+                        posMax[x] = blocksPosition.get(j).x;
                         PosMaxX[x] = blocksPosition.get(j).y;
                     }
+                }
 
             }
         for (int j = 0; j < 4; j++)
@@ -80,11 +85,12 @@ public class Block {
     public void minoreX(int posMax[], int PosMaxX[]) {
         for (int x = 0; x < 4; x++)
             for (int j = 0; j < 4; j++) {
-                if (blocksPosition.get(j).y == x)
+                if (blocksPosition.get(j).y == x) {
                     if (posMax[x] > blocksPosition.get(j).x) {
                         posMax[x] = blocksPosition.get(j).x;
                         PosMaxX[x] = blocksPosition.get(j).y;
                     }
+                }
             }
         for (int j = 0; j < 4; j++)
             if (posMax[j] != 99) {
@@ -98,8 +104,12 @@ public class Block {
         position.y += 50;
     }
 
-    public Point getPoint(int i){return new Point(blocksPosition.get(i));}
+    public Point getPoint(int i) {
+        return new Point(blocksPosition.get(i));
+    }
 
-    public Color getColor(){ return color;}
+    public Color getColor() {
+        return color;
+    }
 
 }

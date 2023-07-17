@@ -4,6 +4,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.util.ArrayList;
 
 public class Board extends JPanel implements KeyListener, ActionListener {
 
@@ -84,20 +85,23 @@ public class Board extends JPanel implements KeyListener, ActionListener {
 
     public void actionPerformed(ActionEvent e) {
         timer += 150;
-        if (timer == 2550 || stascendendo)
-            scendi();
+        if (timer == 2550 || stascendendo) {
+            descent();
+        }
     }
 
-    public void scendi() {
-        int[] PosMax = new int[4];
-        int[] PosMaxX = new int[4];
-        for (int i = 0; i < 4; i++) {
-            PosMax[i]--;
-            PosMaxX[i]--;
-        }
-        prova.minore(PosMax, PosMaxX);
+    public void descent() {
 
-        if ((PosMax[0] == -1 || (PosMax[0] < 15 && !scacchiera[PosMax[0] + 1][PosMaxX[0]])) && (PosMax[1] == -1 || (PosMax[1] < 15 && scacchiera[PosMax[1] + 1][PosMaxX[1]] == false)) && (PosMax[2] == -1 || (PosMax[2] < 15 && scacchiera[PosMax[2] + 1][PosMaxX[2]] == false)) && (PosMax[3] == -1 || (PosMax[3] < 15 && scacchiera[PosMax[3] + 1][PosMaxX[3]] == false))) {
+        ArrayList<Point> absPath = prova.getAbsolutePosition();
+
+        boolean clearDescent = true;
+        for (int i = 0; i < 4; i++)
+            if (absPath.get(i).y >= 15 || absPath.get(i).x >= 10 || absPath.get(i).x < 0 || scacchiera[absPath.get(i).y + 1][absPath.get(i).x]) {
+                clearDescent = false;
+                break;
+            }
+
+        if (clearDescent) {
             prova.drop();
             stascendendo = true;
             repaint();
@@ -123,27 +127,17 @@ public class Board extends JPanel implements KeyListener, ActionListener {
 
     public void keyPressed(KeyEvent e) {
         if ((e.getKeyChar() == 'r' || e.getKeyChar() == 'R') && inizio) {
-            int posX[] = new int[4];
-            int posY[] = new int[4];
-            for (int i = 0; i < 4; i++) {
-                posX[i] = prova.getPoint(i).x;
-                posY[i] = prova.getPoint(i).y;
-            }
-            Block prova2 = new Block(prova);
 
-            prova2.rotate();
-//            System.out.println(prova2.blocksPosition);
-            int k = 0;
-            for (int i = 0; i < 4; i++) {
-                if (prova2.getPoint(i).x * 50 + prova2.position.x < 500 && prova2.getPoint(i).x * 50 + prova2.position.x > 0 && (!scacchiera[(prova2.getPoint(i).y * 50 + prova2.position.y) / 50][(prova2.getPoint(i).x * 50 + prova2.position.x) / 50]))
-                    k++;
-            }
-            if (k == 4) {
-//                System.out.println(prova.blocksPosition);
-                prova.rotate();
+            ArrayList<Point> rotationPoints = prova.getRotationPoints();
+            ArrayList<Point> absoluteRotationPoints = prova.getAbsolutePosition(rotationPoints);
 
-                repaint();
-            }
+            for (int i = 0; i < 4; i++)
+                if (absoluteRotationPoints.get(i).x >= 10 || absoluteRotationPoints.get(i).x < 0 || scacchiera[absoluteRotationPoints.get(i).y][absoluteRotationPoints.get(i).x])
+                    return;
+
+            prova.setBlocksPosition(rotationPoints);
+            repaint();
+
         }
 
         if (e.getKeyCode() == 39 && inizio) {
@@ -156,10 +150,12 @@ public class Board extends JPanel implements KeyListener, ActionListener {
             prova.maggioreX(PosMax, PosMaxY);
             int k = 0;
             for (int i = 0; i < 4; i++) {
-                if (prova.getPoint(i).x * 50 + prova.position.x < 450)
+                if (prova.getPoint(i).x * 50 + prova.position.x < 450) {
                     k++;
-                if (PosMax[i] == -1 || (PosMax[i] + 1) > 9 || !scacchiera[PosMaxY[i]][PosMax[i] + 1])
+                }
+                if (PosMax[i] == -1 || (PosMax[i] + 1) > 9 || !scacchiera[PosMaxY[i]][PosMax[i] + 1]) {
                     k++;
+                }
             }
             if (k == 8) {
                 prova.position.x += 50;
@@ -177,10 +173,12 @@ public class Board extends JPanel implements KeyListener, ActionListener {
             prova.minoreX(PosMax, PosMaxY);
             int k = 0;
             for (int i = 0; i < 4; i++) {
-                if (prova.getPoint(i).x * 50 + prova.position.x > 0)
+                if (prova.getPoint(i).x * 50 + prova.position.x > 0) {
                     k++;
-                if (PosMax[i] == 99 || (PosMax[i] - 1) < 0 || scacchiera[PosMaxY[i]][PosMax[i] - 1] == false)
+                }
+                if (PosMax[i] == 99 || (PosMax[i] - 1) < 0 || scacchiera[PosMaxY[i]][PosMax[i] - 1] == false) {
                     k++;
+                }
             }
             if (k == 8) {
                 prova.position.x -= 50;
