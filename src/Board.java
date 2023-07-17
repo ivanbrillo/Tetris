@@ -98,7 +98,7 @@ public class Board extends JPanel implements KeyListener, ActionListener {
         prova.minore(PosMax, PosMaxX);
 
         if ((PosMax[0] == -1 || (PosMax[0] < 15 && scacchiera[PosMax[0] + 1][PosMaxX[0]] == false)) && (PosMax[1] == -1 || (PosMax[1] < 15 && scacchiera[PosMax[1] + 1][PosMaxX[1]] == false)) && (PosMax[2] == -1 || (PosMax[2] < 15 && scacchiera[PosMax[2] + 1][PosMaxX[2]] == false)) && (PosMax[3] == -1 || (PosMax[3] < 15 && scacchiera[PosMax[3] + 1][PosMaxX[3]] == false))) {
-            prova.scendi();
+            prova.drop();
             stascendendo = true;
             repaint();
         } else {
@@ -132,14 +132,14 @@ public class Board extends JPanel implements KeyListener, ActionListener {
             Block prova2 = new Block(prova);
             prova2.posizionex = prova.posizionex;
             prova2.posizioney = prova.posizioney;
-            prova2.gira();
+            prova2.rotate();
             int k = 0;
             for (int i = 0; i < 4; i++) {
                 if (prova2.PosX[i] * 50 + prova2.posizionex < 500 && prova2.PosX[i] * 50 + prova2.posizionex > 0 && (scacchiera[(prova2.PosY[i] * 50 + prova2.posizioney) / 50][(prova2.PosX[i] * 50 + prova2.posizionex) / 50] == false))
                     k++;
             }
             if (k == 4) {
-                prova.gira();
+                prova.rotate();
                 repaint();
             }
         }

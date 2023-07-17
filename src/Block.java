@@ -9,35 +9,39 @@ public class Block {
     public int PosX[];
     public int PosY[];
 
-    private double rotx;
-    private double roty;
 
-    public Block(Color color, double rotx, double roty, int[] vettx, int[] vetty) {
+    private int lenght;
+
+    public Block(Color color, int[] vettx, int[] vetty, int lenght) {
 
         this.color = color;
-        this.rotx = rotx;
-        this.roty = roty;
         PosX = vettx;
         PosY = vetty;
+        this.lenght = lenght;
 
     }
 
     public Block(Block block){
 
         this.color = block.color;
-        this.rotx = block.rotx;
-        this.roty = block.roty;
         PosX = Arrays.copyOf(block.PosX, block.PosX.length);
         PosY = Arrays.copyOf(block.PosY, block.PosY.length);
+        this.lenght = block.lenght;
+
 
     }
 
 
-    public void gira() {
+    public void rotate() {
+
+        if(color.equals(Color.yellow))
+            return;
+
         for (int i = 0; i < 4; i++) {
             int tmp = PosX[i];
-            PosX[i] = (int) (-PosY[i] + rotx + roty) - 1;
-            PosY[i] = (int) (tmp - rotx + roty);
+
+            PosX[i] = PosY[i];
+            PosY[i] = 1 - (tmp - (lenght - 2));
 
         }
     }
@@ -92,7 +96,7 @@ public class Block {
     }
 
 
-    public void scendi() {
+    public void drop() {
         posizioney += 50;
     }
 
