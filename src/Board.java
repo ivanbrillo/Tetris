@@ -14,7 +14,7 @@ public class Board extends JPanel implements KeyListener, ActionListener {
     boolean scacchiera[][] = new boolean[16][10];
     Color scacchiera2[][] = new Color[16][10];
     int timer = 0;
-    boolean stascendendo = false;
+    boolean descending = false;
     Image miaimmagine;
     Image miaimmagine2;
     boolean inizio = false;
@@ -32,60 +32,60 @@ public class Board extends JPanel implements KeyListener, ActionListener {
 
     public void paintComponent(Graphics g) {
         super.paintComponent(g);
+
         if (!inizio) {
             g.drawImage(miaimmagine, 240, 120, this);
+            g.setColor(Color.WHITE);
+            g.setFont(new Font("Arial", Font.PLAIN, 30));
+            g.drawString("Press space to start", 210, 600);
+            return;
+        }
+
+
+        if (!perdita) {
+            g.setColor(Color.black);
+            for (int i = 0; i < 4; i++) {
+                g.setColor(prova.getColor());
+                g.fillRect(prova.getPoint(i).x * 50 + prova.position.x, prova.getPoint(i).y * 50 + prova.position.y, 50, 50);
+            }
+            for (int i = 0; i < 16; i++)
+                for (int j = 0; j < 10; j++)
+                    if (scacchiera[i][j]) {
+                        g.setColor(scacchiera2[i][j]);
+                        g.fillRect(j * 50, i * 50, 50, 50);
+                    }
+
+            g.setColor(Color.white);
+            for (int j = 0; j < 16; j++)
+                g.drawLine(0, j * 50, 500, j * 50);
+            for (int j = 0; j <= 10; j++)
+                g.drawLine(j * 50, 0, j * 50, 800);
 
             g.setColor(Color.WHITE);
 
             g.setFont(new Font("Arial", Font.PLAIN, 30));
 
-            g.drawString("Premere spazio per iniziare", 210, 600);
+            g.drawString("Prossimo pezzo:", 540, 150);
+
+            g.setFont(new Font("Arial", Font.PLAIN, 15));
+
+            g.drawString("Premi f per farlo cadere piu' velocemente", 520, 600);
+            g.drawString("Premi r per far ruotare il pezzo", 520, 550);
+            g.drawString("Premi le freccette per muovere il pezzo", 520, 500);
+            for (int i = 0; i < 4; i++) {
+                g.setColor(prova2.getColor());
+                g.fillRect(prova2.getPoint(i).x * 50 + 550, prova2.getPoint(i).y * 50 + 200, 50, 50);
+            }
 
         } else {
-            if (!perdita) {
-                g.setColor(Color.black);
-                for (int i = 0; i < 4; i++) {
-                    g.setColor(prova.getColor());
-                    g.fillRect(prova.getPoint(i).x * 50 + prova.position.x, prova.getPoint(i).y * 50 + prova.position.y, 50, 50);
-                }
-                for (int i = 0; i < 16; i++)
-                    for (int j = 0; j < 10; j++)
-                        if (scacchiera[i][j]) {
-                            g.setColor(scacchiera2[i][j]);
-                            g.fillRect(j * 50, i * 50, 50, 50);
-                        }
-
-                g.setColor(Color.white);
-                for (int j = 0; j < 16; j++)
-                    g.drawLine(0, j * 50, 500, j * 50);
-                for (int j = 0; j <= 10; j++)
-                    g.drawLine(j * 50, 0, j * 50, 800);
-
-                g.setColor(Color.WHITE);
-
-                g.setFont(new Font("Arial", Font.PLAIN, 30));
-
-                g.drawString("Prossimo pezzo:", 540, 150);
-
-                g.setFont(new Font("Arial", Font.PLAIN, 15));
-
-                g.drawString("Premi f per farlo cadere piu' velocemente", 520, 600);
-                g.drawString("Premi r per far ruotare il pezzo", 520, 550);
-                g.drawString("Premi le freccette per muovere il pezzo", 520, 500);
-                for (int i = 0; i < 4; i++) {
-                    g.setColor(prova2.getColor());
-                    g.fillRect(prova2.getPoint(i).x * 50 + 550, prova2.getPoint(i).y * 50 + 200, 50, 50);
-                }
-
-            } else {
-                g.drawImage(miaimmagine2, 250, 250, this);
-            }
+            g.drawImage(miaimmagine2, 250, 250, this);
         }
+
     }
 
     public void actionPerformed(ActionEvent e) {
         timer += 150;
-        if (timer == 2550 || stascendendo) {
+        if (timer == 2550 || descending) {
             descent();
         }
     }
@@ -94,153 +94,119 @@ public class Board extends JPanel implements KeyListener, ActionListener {
 
         ArrayList<Point> absPath = prova.getAbsolutePosition();
 
-        boolean clearDescent = true;
-        for (int i = 0; i < 4; i++)
-            if (absPath.get(i).y >= 15 || absPath.get(i).x >= 10 || absPath.get(i).x < 0 || scacchiera[absPath.get(i).y + 1][absPath.get(i).x]) {
-                clearDescent = false;
-                break;
+        descending = true;
+        for (Point point : absPath)
+            if (point.y >= 15 || point.x >= 10 || point.x < 0 || scacchiera[point.y + 1][point.x]) {
+                endDescent(absPath);
+                repaint();
+                return;
             }
 
-        if (clearDescent) {
-            prova.drop();
-            stascendendo = true;
-            repaint();
-        } else {
-            timer = 0;
-            for (int i = 0; i < 4; i++) {
-                scacchiera[(prova.getPoint(i).y * 50 + prova.position.y) / 50][(prova.getPoint(i).x * 50 + prova.position.x) / 50] = true;
-                scacchiera2[(prova.getPoint(i).y * 50 + prova.position.y) / 50][(prova.getPoint(i).x * 50 + prova.position.x) / 50] = prova.getColor();
-            }
-            stascendendo = false;
-            checkRiga();
-            checkFregature();
+        prova.drop();
+        repaint();
+    }
 
-            prova = prova2;
-            prova2 = BlockFactory.getRandomBlock();
+    private void endDescent(ArrayList<Point> absPath) {
 
-            repaint();
+        timer = 0;
+        for (Point point : absPath) {
+            scacchiera[point.y][point.x] = true;
+            scacchiera2[point.y][point.x] = prova.getColor();
         }
+
+        checkFullRow();
+        checkGameOver();
+
+        prova = prova2;
+        prova2 = BlockFactory.getRandomBlock();
+
     }
 
-    public void keyTyped(KeyEvent e) {
-    }
 
     public void keyPressed(KeyEvent e) {
-        if ((e.getKeyChar() == 'r' || e.getKeyChar() == 'R') && inizio) {
 
-            ArrayList<Point> rotationPoints = prova.getRotationPoints();
-            ArrayList<Point> absoluteRotationPoints = prova.getAbsolutePosition(rotationPoints);
+        int keyPressed = e.getKeyCode();
 
-            for (int i = 0; i < 4; i++)
-                if (absoluteRotationPoints.get(i).x >= 10 || absoluteRotationPoints.get(i).x < 0 || scacchiera[absoluteRotationPoints.get(i).y][absoluteRotationPoints.get(i).x])
-                    return;
-
-            prova.setBlocksPosition(rotationPoints);
+        if (keyPressed == ' ') {
+            inizio = true;
+            tm.start();
             repaint();
-
         }
 
-        if (e.getKeyCode() == 39 && inizio) {
-            int[] PosMax = new int[4];
-            int[] PosMaxY = new int[4];
-            for (int i = 0; i < 4; i++) {
-                PosMaxY[i]--;
-                PosMax[i]--;
-            }
-            prova.maggioreX(PosMax, PosMaxY);
-            int k = 0;
-            for (int i = 0; i < 4; i++) {
-                if (prova.getPoint(i).x * 50 + prova.position.x < 450) {
-                    k++;
-                }
-                if (PosMax[i] == -1 || (PosMax[i] + 1) > 9 || !scacchiera[PosMaxY[i]][PosMax[i] + 1]) {
-                    k++;
-                }
-            }
-            if (k == 8) {
-                prova.position.x += 50;
+        if (!inizio) {
+            return;
+        }
+
+        switch (keyPressed) {
+
+            case 'r', 'R' -> {
+                ArrayList<Point> rotationPoints = prova.getRotationPoints();
+                ArrayList<Point> absoluteRotationPoints = prova.getAbsolutePosition(rotationPoints);
+                for (Point point : absoluteRotationPoints)
+                    if (point.x >= 10 || point.x < 0 || scacchiera[point.y][point.x]) {
+                        return;
+                    }
+
+                prova.setBlocksPosition(rotationPoints);
                 repaint();
             }
-        }
 
-        if (e.getKeyCode() == 37 && inizio) {
-            int PosMax[] = new int[4];
-            int PosMaxY[] = new int[4];
-            for (int i = 0; i < 4; i++) {
-                PosMaxY[i] = 99;
-                PosMax[i] = 99;
-            }
-            prova.minoreX(PosMax, PosMaxY);
-            int k = 0;
-            for (int i = 0; i < 4; i++) {
-                if (prova.getPoint(i).x * 50 + prova.position.x > 0) {
-                    k++;
-                }
-                if (PosMax[i] == 99 || (PosMax[i] - 1) < 0 || scacchiera[PosMaxY[i]][PosMax[i] - 1] == false) {
-                    k++;
-                }
-            }
-            if (k == 8) {
-                prova.position.x -= 50;
+            case KeyEvent.VK_RIGHT, KeyEvent.VK_LEFT -> {
+
+                int shift = keyPressed == KeyEvent.VK_RIGHT ? +1 : -1;
+                ArrayList<Point> positions = prova.getAbsolutePosition();
+                for (Point point : positions)
+                    if ((shift == 1 && point.x >= 9) || (shift == -1 && point.x <= 0) || scacchiera[point.y][point.x + shift]) {
+                        return;
+                    }
+
+                prova.position.x += shift * 50;
                 repaint();
+
             }
+
+            case 'f', 'F' -> descending = true;
         }
-
-        if ((e.getKeyChar() == 'f' || e.getKeyChar() == 'F') && inizio) {
-            stascendendo = true;
-        }
-
-        if (e.getKeyChar() == ' ') {
-            if (!inizio) {
-                inizio = true;
-                tm.start();
-                repaint();
-            }
-        }
-
-
     }
 
     public void keyReleased(KeyEvent e) {
     }
 
-    public void checkRiga() {
-        int k = 0;
-        boolean eliminariga = false;
+    public void keyTyped(KeyEvent e) {
+    }
 
-        for (int i = 0; i < 16; i++) {
-            for (int j = 0; j < 10; j++) {
-                if (scacchiera[i][j] == true) {
-                    k++;
+    public void checkFullRow() {
+
+        for (int i = 3; i < 16; i++) {
+
+            boolean fullRow = true;
+            for (int j = 0; j < 10; j++)
+                if (!scacchiera[i][j]) {
+                    fullRow = false;
+                    break;
                 }
+
+            if (!fullRow) {
+                continue;
             }
-            if (k >= 10) {
-                //scacchiera[i]=new boolean[10];
-                // scacchiera2[i] = new Color[10];
-                //boolean tmp[] = new boolean[10];
-                //Color tmp2[] = new Color[10];
-                for (int x = i; x > 0; x--) {
-                    scacchiera[x] = scacchiera[x - 1];
-                    scacchiera2[x] = scacchiera2[x - 1];
-                }
-                scacchiera[0] = new boolean[10];
-                scacchiera2[0] = new Color[10];
-                //checkRiga();
-                eliminariga = true;
+
+            for (int x = i; x > 0; x--) {
+                scacchiera[x] = scacchiera[x - 1];
+                scacchiera2[x] = scacchiera2[x - 1];
             }
-            k = 0;
-            repaint();
+
+            scacchiera[0] = new boolean[10];
+            scacchiera2[0] = new Color[10];
+
         }
     }
 
-    public void checkFregature() {
+    public void checkGameOver() {
         for (int i = 0; i < 10; i++)
-            if (scacchiera[2][i] == true) {
+            if (scacchiera[2][i]) {
                 perdita = true;
-
                 tm.stop();
-                repaint();
-                break;
+                return;
             }
     }
 
