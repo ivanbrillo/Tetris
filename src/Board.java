@@ -9,49 +9,46 @@ import java.util.ArrayList;
 public class Board extends JPanel implements KeyListener, ActionListener {
 
     Timer tm = new Timer(150, this);
-    Block prova = BlockFactory.getRandomBlock();
-    Block prova2 = BlockFactory.getRandomBlock();
-    boolean scacchiera[][] = new boolean[16][10];
-    Color scacchiera2[][] = new Color[16][10];
+    Block mainBlock = BlockFactory.getRandomBlock();
+    Block nextBlock = BlockFactory.getRandomBlock();
+    boolean[][] isOccupiedBoard = new boolean[16][10];
+    Color[][] colorsBoard = new Color[16][10];
     int timer = 0;
     boolean descending = false;
-    Image miaimmagine;
-    Image miaimmagine2;
-    boolean inizio = false;
-    boolean perdita = false;
+    Image startImage = new ImageIcon("resources/start.png").getImage();
+    Image gameOverImage = new ImageIcon("resources/gameOver.jpg").getImage();
+    boolean isStarted = false;
+    boolean isLost = false;
 
     public Board() {
         setPreferredSize(new Dimension(800, 800));
         setBackground(Color.black);
         addKeyListener(this);
         setFocusable(true);
-        miaimmagine = new ImageIcon("resources/ciao.png").getImage();
-        miaimmagine2 = new ImageIcon("resources/Immagine1.jpg").getImage();
-
     }
 
     public void paintComponent(Graphics g) {
         super.paintComponent(g);
 
-        if (!inizio) {
-            g.drawImage(miaimmagine, 240, 120, this);
+        if (!isStarted) {
+            g.drawImage(startImage, 240, 120, this);
             g.setColor(Color.WHITE);
             g.setFont(new Font("Arial", Font.PLAIN, 30));
-            g.drawString("Press space to start", 210, 600);
+            g.drawString("Press space to start", 265, 600);
             return;
         }
 
 
-        if (!perdita) {
+        if (!isLost) {
             g.setColor(Color.black);
             for (int i = 0; i < 4; i++) {
-                g.setColor(prova.getColor());
-                g.fillRect(prova.getPoint(i).x * 50 + prova.position.x, prova.getPoint(i).y * 50 + prova.position.y, 50, 50);
+                g.setColor(mainBlock.getColor());
+                g.fillRect(mainBlock.getPoint(i).x * 50 + mainBlock.position.x, mainBlock.getPoint(i).y * 50 + mainBlock.position.y, 50, 50);
             }
             for (int i = 0; i < 16; i++)
                 for (int j = 0; j < 10; j++)
-                    if (scacchiera[i][j]) {
-                        g.setColor(scacchiera2[i][j]);
+                    if (isOccupiedBoard[i][j]) {
+                        g.setColor(colorsBoard[i][j]);
                         g.fillRect(j * 50, i * 50, 50, 50);
                     }
 
@@ -73,12 +70,12 @@ public class Board extends JPanel implements KeyListener, ActionListener {
             g.drawString("Premi r per far ruotare il pezzo", 520, 550);
             g.drawString("Premi le freccette per muovere il pezzo", 520, 500);
             for (int i = 0; i < 4; i++) {
-                g.setColor(prova2.getColor());
-                g.fillRect(prova2.getPoint(i).x * 50 + 550, prova2.getPoint(i).y * 50 + 200, 50, 50);
+                g.setColor(nextBlock.getColor());
+                g.fillRect(nextBlock.getPoint(i).x * 50 + 550, nextBlock.getPoint(i).y * 50 + 200, 50, 50);
             }
 
         } else {
-            g.drawImage(miaimmagine2, 250, 250, this);
+            g.drawImage(gameOverImage, 250, 250, this);
         }
 
     }
@@ -92,17 +89,17 @@ public class Board extends JPanel implements KeyListener, ActionListener {
 
     public void descent() {
 
-        ArrayList<Point> absPath = prova.getAbsolutePosition();
+        ArrayList<Point> absPath = mainBlock.getAbsolutePosition();
 
         descending = true;
         for (Point point : absPath)
-            if (point.y >= 15 || point.x >= 10 || point.x < 0 || scacchiera[point.y + 1][point.x]) {
+            if (point.y >= 15 || point.x >= 10 || point.x < 0 || isOccupiedBoard[point.y + 1][point.x]) {
                 endDescent(absPath);
                 repaint();
                 return;
             }
 
-        prova.drop();
+        mainBlock.drop();
         repaint();
     }
 
@@ -110,15 +107,15 @@ public class Board extends JPanel implements KeyListener, ActionListener {
 
         timer = 0;
         for (Point point : absPath) {
-            scacchiera[point.y][point.x] = true;
-            scacchiera2[point.y][point.x] = prova.getColor();
+            isOccupiedBoard[point.y][point.x] = true;
+            colorsBoard[point.y][point.x] = mainBlock.getColor();
         }
 
         checkFullRow();
         checkGameOver();
 
-        prova = prova2;
-        prova2 = BlockFactory.getRandomBlock();
+        mainBlock = nextBlock;
+        nextBlock = BlockFactory.getRandomBlock();
 
     }
 
@@ -128,39 +125,39 @@ public class Board extends JPanel implements KeyListener, ActionListener {
         int keyPressed = e.getKeyCode();
 
         if (keyPressed == ' ') {
-            inizio = true;
+            isStarted = true;
             tm.start();
             repaint();
         }
 
-        if (!inizio) {
+        if (!isStarted) {
             return;
         }
 
         switch (keyPressed) {
 
             case 'r', 'R' -> {
-                ArrayList<Point> rotationPoints = prova.getRotationPoints();
-                ArrayList<Point> absoluteRotationPoints = prova.getAbsolutePosition(rotationPoints);
+                ArrayList<Point> rotationPoints = mainBlock.getRotationPoints();
+                ArrayList<Point> absoluteRotationPoints = mainBlock.getAbsolutePosition(rotationPoints);
                 for (Point point : absoluteRotationPoints)
-                    if (point.x >= 10 || point.x < 0 || scacchiera[point.y][point.x]) {
+                    if (point.x >= 10 || point.x < 0 || isOccupiedBoard[point.y][point.x]) {
                         return;
                     }
 
-                prova.setBlocksPosition(rotationPoints);
+                mainBlock.setBlocksPosition(rotationPoints);
                 repaint();
             }
 
             case KeyEvent.VK_RIGHT, KeyEvent.VK_LEFT -> {
 
                 int shift = keyPressed == KeyEvent.VK_RIGHT ? +1 : -1;
-                ArrayList<Point> positions = prova.getAbsolutePosition();
+                ArrayList<Point> positions = mainBlock.getAbsolutePosition();
                 for (Point point : positions)
-                    if ((shift == 1 && point.x >= 9) || (shift == -1 && point.x <= 0) || scacchiera[point.y][point.x + shift]) {
+                    if ((shift == 1 && point.x >= 9) || (shift == -1 && point.x <= 0) || isOccupiedBoard[point.y][point.x + shift]) {
                         return;
                     }
 
-                prova.position.x += shift * 50;
+                mainBlock.position.x += shift * 50;
                 repaint();
 
             }
@@ -181,7 +178,7 @@ public class Board extends JPanel implements KeyListener, ActionListener {
 
             boolean fullRow = true;
             for (int j = 0; j < 10; j++)
-                if (!scacchiera[i][j]) {
+                if (!isOccupiedBoard[i][j]) {
                     fullRow = false;
                     break;
                 }
@@ -191,20 +188,20 @@ public class Board extends JPanel implements KeyListener, ActionListener {
             }
 
             for (int x = i; x > 0; x--) {
-                scacchiera[x] = scacchiera[x - 1];
-                scacchiera2[x] = scacchiera2[x - 1];
+                isOccupiedBoard[x] = isOccupiedBoard[x - 1];
+                colorsBoard[x] = colorsBoard[x - 1];
             }
 
-            scacchiera[0] = new boolean[10];
-            scacchiera2[0] = new Color[10];
+            isOccupiedBoard[0] = new boolean[10];
+            colorsBoard[0] = new Color[10];
 
         }
     }
 
     public void checkGameOver() {
         for (int i = 0; i < 10; i++)
-            if (scacchiera[2][i]) {
-                perdita = true;
+            if (isOccupiedBoard[2][i]) {
+                isLost = true;
                 tm.stop();
                 return;
             }
