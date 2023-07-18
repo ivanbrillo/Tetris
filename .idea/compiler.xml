@@ -6,8 +6,11 @@
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
-        <module name="Progetto_Klotski" />
+        <module name="Tetris" />
       </profile>
     </annotationProcessing>
+    <bytecodeTargetLevel>
+      <module name="Progetto_Klotski" target="19" />
+    </bytecodeTargetLevel>
   </component>
 </project>

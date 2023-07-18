@@ -6,86 +6,28 @@ import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.util.ArrayList;
 
-public class Board extends JPanel implements KeyListener, ActionListener {
+public class BoardController implements KeyListener, ActionListener {
 
-    Timer tm = new Timer(150, this);
+    private final Timer tm = new Timer(150, this);
     Block mainBlock = BlockFactory.getRandomBlock();
     Block nextBlock = BlockFactory.getRandomBlock();
     boolean[][] isOccupiedBoard = new boolean[16][10];
     Color[][] colorsBoard = new Color[16][10];
-    int timer = 0;
+    private int timer = 0;
     boolean descending = false;
-    Image startImage = new ImageIcon("resources/start.png").getImage();
-    Image gameOverImage = new ImageIcon("resources/gameOver.jpg").getImage();
     boolean isStarted = false;
     boolean isLost = false;
 
-    public Board() {
-        setPreferredSize(new Dimension(850, 800));
-        setBackground(Color.black);
-        addKeyListener(this);
-        setFocusable(true);
-    }
+    final BoardView view;
 
-    public void paintComponent(Graphics g) {
-        super.paintComponent(g);
-
-        if (!isStarted) {
-            g.drawImage(startImage, 240, 120, this);
-            g.setColor(Color.WHITE);
-            g.setFont(new Font("Arial", Font.PLAIN, 30));
-            g.drawString("Press space to start", 265, 600);
-            return;
-        }
-
-        if (!isLost) {
-
-            g.setColor(mainBlock.getColor());
-            ArrayList<Point> absPosition = mainBlock.getAbsolutePosition();
-
-            for (Point point : absPosition)
-                g.fillRect(point.x * 50, point.y * 50, 50, 50);
-
-            for (int i = 0; i < 16; i++)
-                for (int j = 0; j < 10; j++)
-                    if (isOccupiedBoard[i][j]) {
-                        g.setColor(colorsBoard[i][j]);
-                        g.fillRect(j * 50, i * 50, 50, 50);
-                    }
-
-            g.setColor(Color.white);
-            for (int j = 0; j < 16; j++)
-                g.drawLine(0, j * 50, 500, j * 50);
-            for (int j = 0; j <= 10; j++)
-                g.drawLine(j * 50, 0, j * 50, 800);
-
-            g.setColor(Color.WHITE);
-            g.setFont(new Font("Arial", Font.PLAIN, 30));
-            g.drawString("Next Piece:", 590, 150);
-
-            g.setFont(new Font("Arial", Font.PLAIN, 15));
-            g.drawString("Press 'f' to start the descending", 520, 600);
-            g.drawString("Press 'r' to rotate the piece", 520, 550);
-            g.drawString("Press the horizontal arrows to move the piece", 520, 500);
-
-            g.setColor(nextBlock.getColor());
-            ArrayList<Point> nextBlockAbsolutePosition = nextBlock.getAbsolutePosition();
-
-            for (Point point : nextBlockAbsolutePosition)
-                g.fillRect(point.x * 50 + 450, point.y * 50 + 150, 50, 50);
-
-        }
-
-        if (isLost)
-            g.drawImage(gameOverImage, 250, 250, this);
-
+    public BoardController() {
+        view = new BoardView(this);
     }
 
     public void actionPerformed(ActionEvent e) {
         timer += 150;
-        if (timer == 2550 || descending) {
+        if (timer == 2550 || descending)
             descent();
-        }
     }
 
     public void descent() {
@@ -96,12 +38,12 @@ public class Board extends JPanel implements KeyListener, ActionListener {
         for (Point point : absPath)
             if (point.y >= 15 || point.x >= 10 || point.x < 0 || isOccupiedBoard[point.y + 1][point.x]) {
                 endDescent(absPath);
-                repaint();
+                view.repaint();
                 return;
             }
 
         mainBlock.drop();
-        repaint();
+        view.repaint();
     }
 
     private void endDescent(ArrayList<Point> absPath) {
@@ -130,12 +72,11 @@ public class Board extends JPanel implements KeyListener, ActionListener {
         if (keyPressed == ' ') {
             isStarted = true;
             tm.start();
-            repaint();
+            view.repaint();
         }
 
         if (!isStarted)
             return;
-
 
         switch (keyPressed) {
 
@@ -148,7 +89,7 @@ public class Board extends JPanel implements KeyListener, ActionListener {
                     }
 
                 mainBlock.setBlocksPosition(rotationPoints);
-                repaint();
+                view.repaint();
             }
 
             case KeyEvent.VK_RIGHT, KeyEvent.VK_LEFT -> {
@@ -161,7 +102,7 @@ public class Board extends JPanel implements KeyListener, ActionListener {
                     }
 
                 mainBlock.position.x += shift * 50;
-                repaint();
+                view.repaint();
 
             }
 
