@@ -21,7 +21,7 @@ public class Board extends JPanel implements KeyListener, ActionListener {
     boolean isLost = false;
 
     public Board() {
-        setPreferredSize(new Dimension(800, 800));
+        setPreferredSize(new Dimension(850, 800));
         setBackground(Color.black);
         addKeyListener(this);
         setFocusable(true);
@@ -38,13 +38,14 @@ public class Board extends JPanel implements KeyListener, ActionListener {
             return;
         }
 
-
         if (!isLost) {
-            g.setColor(Color.black);
-            for (int i = 0; i < 4; i++) {
-                g.setColor(mainBlock.getColor());
-                g.fillRect(mainBlock.getPoint(i).x * 50 + mainBlock.position.x, mainBlock.getPoint(i).y * 50 + mainBlock.position.y, 50, 50);
-            }
+
+            g.setColor(mainBlock.getColor());
+            ArrayList<Point> absPosition = mainBlock.getAbsolutePosition();
+
+            for (Point point : absPosition)
+                g.fillRect(point.x * 50, point.y * 50, 50, 50);
+
             for (int i = 0; i < 16; i++)
                 for (int j = 0; j < 10; j++)
                     if (isOccupiedBoard[i][j]) {
@@ -59,24 +60,24 @@ public class Board extends JPanel implements KeyListener, ActionListener {
                 g.drawLine(j * 50, 0, j * 50, 800);
 
             g.setColor(Color.WHITE);
-
             g.setFont(new Font("Arial", Font.PLAIN, 30));
-
-            g.drawString("Prossimo pezzo:", 540, 150);
+            g.drawString("Next Piece:", 590, 150);
 
             g.setFont(new Font("Arial", Font.PLAIN, 15));
+            g.drawString("Press 'f' to start the descending", 520, 600);
+            g.drawString("Press 'r' to rotate the piece", 520, 550);
+            g.drawString("Press the horizontal arrows to move the piece", 520, 500);
 
-            g.drawString("Premi f per farlo cadere piu' velocemente", 520, 600);
-            g.drawString("Premi r per far ruotare il pezzo", 520, 550);
-            g.drawString("Premi le freccette per muovere il pezzo", 520, 500);
-            for (int i = 0; i < 4; i++) {
-                g.setColor(nextBlock.getColor());
-                g.fillRect(nextBlock.getPoint(i).x * 50 + 550, nextBlock.getPoint(i).y * 50 + 200, 50, 50);
-            }
+            g.setColor(nextBlock.getColor());
+            ArrayList<Point> nextBlockAbsolutePosition = nextBlock.getAbsolutePosition();
 
-        } else {
-            g.drawImage(gameOverImage, 250, 250, this);
+            for (Point point : nextBlockAbsolutePosition)
+                g.fillRect(point.x * 50 + 450, point.y * 50 + 150, 50, 50);
+
         }
+
+        if (isLost)
+            g.drawImage(gameOverImage, 250, 250, this);
 
     }
 
@@ -106,6 +107,8 @@ public class Board extends JPanel implements KeyListener, ActionListener {
     private void endDescent(ArrayList<Point> absPath) {
 
         timer = 0;
+        descending = false;
+
         for (Point point : absPath) {
             isOccupiedBoard[point.y][point.x] = true;
             colorsBoard[point.y][point.x] = mainBlock.getColor();
@@ -130,9 +133,9 @@ public class Board extends JPanel implements KeyListener, ActionListener {
             repaint();
         }
 
-        if (!isStarted) {
+        if (!isStarted)
             return;
-        }
+
 
         switch (keyPressed) {
 
