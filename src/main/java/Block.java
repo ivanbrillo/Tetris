@@ -51,10 +51,6 @@ public class Block {
         position.y += 50;
     }
 
-    public Point getPoint(int i) {
-        return new Point(blocksPosition.get(i));
-    }
-
     public Color getColor() {
         return color;
     }
