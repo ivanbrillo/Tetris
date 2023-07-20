@@ -43,20 +43,7 @@ public class BoardView extends JPanel {
                         g.fillRect(j * 50, i * 50, 50, 50);
                     }
 
-            g.setColor(Color.white);
-            for (int j = 0; j <= 16; j++)
-                g.drawLine(0, j * 50, 500, j * 50);
-            for (int j = 0; j <= 10; j++)
-                g.drawLine(j * 50, 0, j * 50, 800);
-
-            g.setColor(Color.WHITE);
-            g.setFont(new Font("Arial", Font.PLAIN, 30));
-            g.drawString("Next Piece:", 590, 150);
-
-            g.setFont(new Font("Arial", Font.PLAIN, 15));
-            g.drawString("Press 'f' to start the descending", 520, 600);
-            g.drawString("Press 'r' to rotate the piece", 520, 550);
-            g.drawString("Press the horizontal arrows to move the piece", 520, 500);
+            paintMenu(g);
 
             g.setColor(board.nextBlock.getColor());
             ArrayList<Point> nextBlockAbsolutePosition = board.nextBlock.getAbsolutePosition();
@@ -68,6 +55,26 @@ public class BoardView extends JPanel {
 
         if (board.isLost)
             g.drawImage(gameOverImage, 250, 250, this);
+
+    }
+
+    private void paintMenu(Graphics g){
+
+        g.setColor(Color.white);
+        for (int j = 0; j <= 16; j++)
+            g.drawLine(0, j * 50, 500, j * 50);
+        for (int j = 0; j <= 10; j++)
+            g.drawLine(j * 50, 0, j * 50, 800);
+
+        g.setColor(Color.WHITE);
+        g.setFont(new Font("Calibri", Font.BOLD, 30));
+        g.drawString("Next Piece:", 620, 150);
+
+        g.setFont(new Font("Calibri", Font.PLAIN, 20));
+        g.drawString("Press the arrows to move the piece", 520, 500);
+        g.drawString("Press 'r' to rotate the piece", 520, 540);
+        g.drawString("Press 'f' to start the descending", 520, 580);
+
 
     }
 
